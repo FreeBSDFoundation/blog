@@ -1,0 +1,36 @@
+- name: Remove log compression on FreeBSD host, add timestamps to rotated logs
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: "Determine name of the ZFS pool"
+      ansible.builtin.command:
+        cmd: "/sbin/zpool list -Ho name"
+      register: poolname
+      changed_when: false
+    - name: Set compression of /var/log dataset to zstd
+      community.general.zfs:
+        name: "{{ poolname.stdout }}/var/log"
+        state: present
+        extra_zfs_properties:
+          compression: zstd
+    - name: "Remove 'J' from the newsyslog.conf file"
+      ansible.builtin.replace:
+        path: /etc/newsyslog.conf
+        regexp: "^J|J"
+        replace: ""
+      notify: "Restart newsyslog service"
+    - name: "Use timestamps instead of numbers for log rotations"
+      ansible.builtin.replace:
+        path: /etc/crontab
+        regexp: "newsyslog$"
+        replace: "newsyslog -t DEFAULT"
+      notify: "Restart syslogd service"
+  handlers:
+    - name: Restart newsyslog service
+      ansible.builtin.service:
+        name: newsyslog
+        state: restarted
+    - name: Restart syslogd service
+      ansible.builtin.service:
+        name: syslogd
+        state: restarted

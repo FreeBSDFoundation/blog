@@ -8,4 +8,5 @@ Keep an eye on this repository, [the blog](https://freebsdfoundation.org/blog) (
 
 ## Blog Posts
 
-3-Apr-25 [OpenZFS Cheat Sheet](https://freebsdfoundation.org/blog/openzfs-cheat-sheet/)
+3-Apr-25 [OpenZFS Cheat Sheet](https://freebsdfoundation.org/blog/openzfs-cheat-sheet)
+16-Apr-25 [ZFS Log Compression on FreeBSD](https://freebsdfoundation.org/blog/zfs-log-compression-on-freebsd)
