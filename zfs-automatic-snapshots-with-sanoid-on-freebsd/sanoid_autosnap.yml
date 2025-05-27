@@ -1,0 +1,47 @@
+- name: "Setup Sanoid Auto Snapshots on FreeBSD"
+  hosts: all
+  gather_facts: false
+  vars:
+    sanoid_conf: "/usr/local/etc/sanoid/sanoid.conf"
+  tasks:
+    - name: "Determine name of the ZFS pool"
+      ansible.builtin.command: "zpool list -Ho name"
+      register: poolname
+    - name: "Install sanoid package"
+      ansible.builtin.package:
+        name: "sanoid"
+    - name: "Remove default sanoid config file"
+      ansible.builtin.file:
+        path: "{{ sanoid_conf }}"
+        state: absent
+    - name: "Create custom {{ sanoid_conf }}"
+      ansible.builtin.blockinfile:
+        path: "{{ sanoid_conf }}"
+        owner: root
+        group: wheel
+        mode: 750
+        create: true
+        block: |
+          [{{ poolname.stdout }}]
+            use_template = {{ poolname.stdout }}
+            recursive = zfs
+
+          #############################
+          # templates below this line #
+          #############################
+          [template_{{ poolname.stdout }}]
+            hourly = 36
+            daily = 14
+            monthly = 6
+            recursive = yes
+            autosnap = yes
+            autoprune = yes
+            frequent_period = 15
+            frequently = 2
+    - name: "Add crontab line for running sanoid"
+      ansible.builtin.lineinfile:
+        path: "/etc/crontab"
+        insertafter: "^1,31"
+        line: "* * * * *       root TZ=UTC /usr/local/bin/sanoid --cron"
+    - name: Take the initial snapshot
+      ansible.builtin.command: "/usr/local/bin/sanoid"
