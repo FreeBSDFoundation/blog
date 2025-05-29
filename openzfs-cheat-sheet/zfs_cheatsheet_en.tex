@@ -417,7 +417,7 @@ margins=tight
 	\begin{itemize}
     \item Delete \verb|@b| through \verb|@d| (inclusive): \texttt{zfs destroy -v mypool@b\%d}
     \item Delete starting from snapshot \verb|@b|: \texttt{zfs destroy -v mypool@b\%}
-    \item Delete snapshots before \verb|@b|: \texttt{zfs destroy -v mypool\%@b}
+    \item Delete snapshots before \verb|@b|: \verb|zfs destroy -v mypool@%b|
 	\end{itemize}
 \item[ZFS Holds] Preserve a snapshot by creating a hold referenced by a custom
   tag (description). ZFS allows multiple tags and only if the last tag is gone,
