@@ -4,7 +4,7 @@ This directory contains scripts related to the [blog post](https://freebsdfounda
 
 ## Qemu
 
-There's a small [wrapper script](runit.sh) for running Qemu, as mentioned in the [YouTube video]().
+There's a small [wrapper script](runit.sh) for running Qemu, as mentioned in the [YouTube video](https://youtu.be/CWuZLJkUBfw).
 
 ## Ansible
 
@@ -32,6 +32,8 @@ $ ./r
 ```
 
 Take a look at [the Makefile](Makefile) to see the simple 'inventory' task. `r` just runs the Ansible [configure](configure.yml) playbook here. You might like to tune the package list in the [inventory](inventory.yml).
+
+You can [watch the video here](https://youtu.be/V9-5QC6vLHY).
 
 ## Tools
 
