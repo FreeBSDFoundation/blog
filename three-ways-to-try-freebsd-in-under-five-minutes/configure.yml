@@ -1,0 +1,91 @@
+# vim: set ft=yaml.ansible:
+- name: "Configure hosts"
+  hosts: all
+  become: true
+  become_method: su
+  gather_facts: false
+  tasks:
+    - name: Wait for SSH access
+      ansible.builtin.wait_for:
+        host: '{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        port: 22
+      vars:
+        ansible_connection: local
+        ansible_python_interpreter: auto_silent
+      become: false
+    - name: Gather facts
+      setup:
+    - name: Save space on FreeBSD
+      file:
+        path: /usr/lib/debug
+        state: absent
+      when: ansible_os_family == 'FreeBSD'
+    - name: Ensure pkg/repos exists
+      file:
+        path: /usr/local/etc/pkg/repos
+        state: directory
+        mode: '0755'
+    - name: Set pkgs to latest
+      copy:
+        dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+        content: 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }'
+        mode: '0644'
+    - name: Ensure packages installed
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"
+      tags: pkgs
+    - name: Set shell for default user
+      user:
+        name: "{{ username | default('ec2-user') }}"
+        shell: '/usr/local/bin/zsh'
+    - name: Some useful shell aliases
+      copy:
+        src: files/aliases.zsh
+        dest: /usr/local/etc/zshrc
+        owner: root
+        group: wheel
+        mode: '0644'
+    - name: Put a user zshrc in place
+      copy:
+        src: 'files/dot-zshrc'
+        dest: '$HOME/.zshrc'
+        mode: '0640'
+      become: false
+    - name: Configure doas
+      copy:
+        dest: '/usr/local/etc/doas.conf'
+        content: "permit nopass :wheel\n"
+        owner: root
+        group: wheel
+        mode: '0400'
+    - name: Ensure sendmail stopped
+      service:
+        name: sendmail
+        state: stopped
+      tags: services
+    - name: sysrc settings
+      community.general.sysrc:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+      loop:
+        - {name: 'postfix_enable', value: "YES"}
+        - {name: 'syslogd_flags', value: "-ss"}
+        - {name: 'sendmail_enable', value: "NO"}
+        - {name: 'jail_enable', value: "YES"}
+        - {name: 'sshd_dsa_enable', value: "no"}
+        - {name: 'sshd_ecdsa_enable', value: "no"}
+        - {name: 'sshd_ed25519_enable', value: "yes"}
+        - {name: 'sshd_rsa_enable', value: "yes"}
+    - name: Ensure postfix started
+      service:
+        name: postfix
+        state: started
+      tags: services
+    - name: Restart syslogd
+      service:
+        name: syslogd
+        state: restarted
+      tags: services

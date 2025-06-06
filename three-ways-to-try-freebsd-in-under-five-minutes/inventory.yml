@@ -1,0 +1,34 @@
+all:
+  vars:
+    ansible_python_interpreter: auto_silent
+    # daily driver essentials :)
+    packages:
+      - bat
+      - curl
+      - doas
+      - duf
+      - dust
+      - freecolor
+      - fzf
+      - git
+      - gmake
+      - neovim
+      - postfix
+      - ripgrep
+      - starship
+      - tmux
+      - wget
+      - zoxide
+      - zsh
+  hosts:
+    qemu:
+      ansible_host: localhost
+      ansible_port: 2222
+      username: CHANGEME
+    ec2:
+      ansible_python_interpreter: /usr/local/bin/python3
+      ansible_host: CHANGEME
+    lightsail:
+      ansible_python_interpreter: /usr/local/bin/python3
+      ansible_host: CHANGEME
+      ansible_ssh_private_key_file: CHANGEME

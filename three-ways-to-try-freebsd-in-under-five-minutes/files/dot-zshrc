@@ -1,0 +1,62 @@
+# vim: set ft=zsh:
+autoload -Uz compinit && compinit
+[ -z "$HISTFILE" ] && HISTFILE="$HOME/.zsh_history"
+[ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
+[ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
+
+bindkey -e
+setopt braceccl               # expand num ranges {1..4}
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+setopt share_history          # share command history across active sessions
+setopt autocd
+
+if [ -d $HOME/perl5 ]; then
+    PERL5LIB="$HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"
+    PERL_LOCAL_LIB_ROOT="$HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"
+    PERL_MB_OPT="--install_base \"$HOME/perl5\""
+    PERL_MM_OPT="INSTALL_BASE=$HOME/perl5"
+    export PERL5LIB PERL_LOCAL_LIB_ROOT PERL_MB_OPT PERL_MM_OPT
+fi
+
+paths=(
+  "$HOME/go/bin"
+  "$HOME/.cargo/bin"
+  "$HOME/.local/bin"
+  "$HOME/perl5/bin"
+)
+for p in ${paths[@]}; do
+  if [[ -d "$p" ]]; then
+    PATH="$PATH:$p"
+  fi
+done
+
+EDITOR="vi"
+if command -v nvim >/dev/null 2>&1; then
+  EDITOR="nvim"
+  alias v=nvim
+fi
+export EDITOR PATH
+
+init_tool() {
+  local tool=$1
+  shift
+  
+  if command -v "$tool" >/dev/null 2>&1; then
+    eval "$($tool "$@")"
+  fi
+}
+
+init_tool starship init zsh
+init_tool fzf --zsh
+init_tool zoxide init zsh
+
+[ -f $HOME/py3/bin/activate ] && source $HOME/py3/bin/activate
+
+# aliases
+alias ez='nvim ~/.zshrc'
+alias rz='source ~/.zshrc'
+
