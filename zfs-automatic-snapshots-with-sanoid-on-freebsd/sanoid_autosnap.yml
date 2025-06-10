@@ -24,7 +24,7 @@
         block: |
           [{{ poolname.stdout }}]
             use_template = {{ poolname.stdout }}
-            recursive = zfs
+            recursive = yes
 
           #############################
           # templates below this line #
@@ -33,7 +33,6 @@
             hourly = 36
             daily = 14
             monthly = 6
-            recursive = yes
             autosnap = yes
             autoprune = yes
             frequent_period = 15
