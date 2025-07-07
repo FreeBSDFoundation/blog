@@ -9,5 +9,5 @@ We're dropping new topics regularly. Keep an eye on this repository, [the blog](
 3-Apr-25 [OpenZFS Cheat Sheet](https://freebsdfoundation.org/blog/openzfs-cheat-sheet)  
 16-Apr-25 [ZFS Log Compression on FreeBSD](https://freebsdfoundation.org/blog/zfs-log-compression-on-freebsd)  
 27-May-25 [ZFS automatic snapshots with Sanoid on FreeBSD](https://freebsdfoundation.org/blog/zfs-automatic-snapshots-with-sanoid-on-freebsd/)  
-16-Jun-25 [Three Ways to Try FreeBSD in under Five Minutes](https://freebsdfoundation.org/blog/three-ways-to-try-freebsd-in-under-five-minutes)
+16-Jun-25 [Three Ways to Try FreeBSD in under Five Minutes](https://freebsdfoundation.org/blog/three-ways-to-try-freebsd-in-under-five-minutes)  
 7-Jul-25 [How To Install and Configure the Galene Video Meeting Server](https://freebsdfoundation.org/blog/how-to-install-and-configure-the-galene-video-meeting-server-on-freebsd/)
