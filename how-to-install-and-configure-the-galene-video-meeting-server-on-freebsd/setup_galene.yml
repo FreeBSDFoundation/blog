@@ -1,0 +1,44 @@
+# vim: set ft=yaml.ansible:
+- name: "Setup Galene Videoconferencing Server on FreeBSD"
+  # hosts: localhost
+  hosts: all
+  gather_facts: false
+  vars:
+    galene_conf:
+      users:
+        admin:
+          password: galene
+          permissions: op
+  tasks:
+    - name: "Determine name of the ZFS pool"
+      ansible.builtin.command: "zpool list -Ho name"
+      register: poolname
+      changed_when: false
+    - name: Create ZFS datasets
+      community.general.storage.zfs.zfs:
+        name: "{{ poolname.stdout }}/var/db/{{ item }}"
+        state: present
+      loop:
+        - "galene/data"
+        - "galene/groups"
+        - "galene/recordings"
+    - name: Install the Galene package
+      ansible.builtin.package:
+        name: galene
+        state: present
+    - name: Create initial Galene config file
+      ansible.builtin.copy:
+        content: "{{ galene_conf | to_nice_json }}\n"
+        dest: /var/db/galene/groups/default.json
+        mode: '0640'
+        owner: "root"
+        group: "galene"
+    - name: Add entry for galene to /etc/rc.conf
+      community.general.system.sysrc:
+        name: galene_enable
+        state: present
+        value: "YES"
+    - name: Start the Galene Server
+      ansible.builtin.service:
+        name: galene
+        state: started
