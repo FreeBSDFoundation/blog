@@ -1,0 +1,43 @@
+- name: Configure FreeBSD jails
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Ensure pkg/repos exists
+      file:
+        path: /usr/local/etc/pkg/repos
+        state: directory
+        mode: '0755'
+    - name: Set pkgs to latest
+      copy:
+        dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+        content: 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }'
+        mode: '0644'
+    - name: Ensure packages installed
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"
+      tags: pkgs
+    - name: A useful zsh base
+      copy:
+        src: files/zshrc
+        dest: /usr/local/etc/zshrc
+        owner: root
+        group: wheel
+        mode: '0644'
+    - name: System config changes (services, settings)
+      community.general.sysrc:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+      loop:
+        - {name: 'postfix_enable', value: "YES"}
+        - {name: 'syslogd_flags', value: "-ss"}
+        - {name: 'sendmail_enable', value: "NONE"}
+    - name: Ensure services started
+      service:
+        name: "{{ item }}"
+        state: started
+      loop:
+        - postfix
+
+# vim: set ft=yaml.ansible:

@@ -1,0 +1,28 @@
+# vim: set ft=yaml.ansible:
+all:
+  vars:
+    ansible_python_interpreter: auto_silent
+  hosts:
+    hetz:
+      ansible_host: YOURHOSTNAMEHERE
+      packages:
+        - dust
+        - fd-find
+        - eza
+        - fzf
+        - git
+        - glow
+        - neovim
+        - postfix
+        - ripgrep
+        - rsync
+        - starship
+        - zoxide
+        - zsh
+jails:
+  hosts:
+    YOURJAILNAMEHERE:
+      ansible_connection: jailexec
+      ansible_jail_host: YOURHOSTNAMEHERE
+      packages:
+        - nginx
