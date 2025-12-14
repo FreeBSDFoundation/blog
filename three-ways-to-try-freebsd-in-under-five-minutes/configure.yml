@@ -2,7 +2,7 @@
 - name: "Configure hosts"
   hosts: all
   become: true
-  become_method: su
+  become_method: ansible.builtin.su
   gather_facts: false
   tasks:
     - name: Wait for SSH access
@@ -14,62 +14,75 @@
         ansible_connection: local
         ansible_python_interpreter: auto_silent
       become: false
+
     - name: Gather facts
-      setup:
+      ansible.builtin.setup:
+
     - name: Save space on FreeBSD
-      file:
+      ansible.builtin.file:
         path: /usr/lib/debug
         state: absent
-      when: ansible_os_family == 'FreeBSD'
+      when: ansible_facts['os_family'] == 'FreeBSD'
+
     - name: Ensure pkg/repos exists
-      file:
+      ansible.builtin.file:
         path: /usr/local/etc/pkg/repos
         state: directory
         mode: '0755'
+
     - name: Set pkgs to latest
-      copy:
+      ansible.builtin.copy:
         dest: /usr/local/etc/pkg/repos/FreeBSD.conf
-        content: 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }'
+        content: 'FreeBSD: { url: "pkg+https://pkg.FreeBSD.org/${ABI}/latest" }'
         mode: '0644'
+
     - name: Ensure packages installed
       ansible.builtin.package:
-        name: "{{ item }}"
+        name: "{{ package }}"
         state: present
       loop: "{{ packages }}"
+      loop_control:
+        loop_var: package
       tags: pkgs
+
     - name: Set shell for default user
-      user:
+      ansible.builtin.user:
         name: "{{ username | default('ec2-user') }}"
         shell: '/usr/local/bin/zsh'
+
     - name: Some useful shell aliases
-      copy:
+      ansible.builtin.copy:
         src: files/aliases.zsh
         dest: /usr/local/etc/zshrc
         owner: root
         group: wheel
         mode: '0644'
+
     - name: Put a user zshrc in place
-      copy:
+      ansible.builtin.copy:
         src: 'files/dot-zshrc'
         dest: '$HOME/.zshrc'
         mode: '0640'
       become: false
+
     - name: Configure doas
-      copy:
+      ansible.builtin.copy:
         dest: '/usr/local/etc/doas.conf'
         content: "permit nopass :wheel\n"
         owner: root
         group: wheel
         mode: '0400'
+
     - name: Ensure sendmail stopped
-      service:
+      ansible.builtin.service:
         name: sendmail
         state: stopped
       tags: services
-    - name: sysrc settings
+
+    - name: Ensure sysrc settings
       community.general.sysrc:
-        name: "{{ item.name }}"
-        value: "{{ item.value }}"
+        name: "{{ setting.name }}"
+        value: "{{ setting.value }}"
       loop:
         - {name: 'postfix_enable', value: "YES"}
         - {name: 'syslogd_flags', value: "-ss"}
@@ -79,13 +92,17 @@
         - {name: 'sshd_ecdsa_enable', value: "no"}
         - {name: 'sshd_ed25519_enable', value: "yes"}
         - {name: 'sshd_rsa_enable', value: "yes"}
+      loop_control:
+        loop_var: setting
+
     - name: Ensure postfix started
-      service:
+      ansible.builtin.service:
         name: postfix
         state: started
       tags: services
+
     - name: Restart syslogd
-      service:
+      ansible.builtin.service:
         name: syslogd
         state: restarted
       tags: services
