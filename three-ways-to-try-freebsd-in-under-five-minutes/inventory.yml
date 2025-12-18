@@ -23,6 +23,7 @@ all:
   hosts:
     qemu:
       ansible_host: localhost
+      ansible_python_interpreter: /usr/local/bin/python3
       ansible_port: 2222
       username: CHANGEME
     ec2:
