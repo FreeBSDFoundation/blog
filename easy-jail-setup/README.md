@@ -4,6 +4,6 @@ This directory contains scripts related to the [blog post](https://freebsdfounda
 
 ## Other videos referenced
 
-FreeBSD on Hetzner: https://youtu.be/8RGbstrTWUo
-FreeBSD on AWS: https://youtu.be/V9-5QC6vLHY
+FreeBSD on Hetzner: https://youtu.be/8RGbstrTWUo  
+FreeBSD on AWS: https://youtu.be/V9-5QC6vLHY  
 FreeBSD on a Macbook: https://youtu.be/CWuZLJkUBfw
