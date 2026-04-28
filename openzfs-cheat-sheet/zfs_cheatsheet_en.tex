@@ -145,14 +145,14 @@ margins=tight
       writes with comparable performance, 66\% total capacity. Shown as
       \texttt{raidz1-0} VDEV in \texttt{zpool status} output.\\ \texttt{zpool create
       paritypool raidz disk1 disk2 disk3}
-    \item[Double-Parity (RAID-Z2)] survives the failure of two disks per VDEV,
+    \item[Double-Parity (RAID-Z2)] Survives the failure of two disks per VDEV,
       slower than RAID-Z1, 4 disks required, 50\% capacity.
       \texttt{zpool create myraidz2 raidz2 disk1 disk2 disk3 disk4}
     \item[RAID10] Min.\ of 4 disks needed, survives failure of 2 disks (one per VDEV)
       high read speeds, write speed half of that, capacity 50\%. Good compromise
       between redundancy, capacity and performance.\\ \texttt{zpool create
       myr10 mirror disk1 disk2 mirror disk3 disk4}
-    \item[Triple-Parity (RAID-Z3)] Little slower than RAID-Z2, redundancy of
+    \item[Triple-Parity (RAID-Z3)] Slightly slower than RAID-Z2, redundancy of
       three disks per VDEV, min. 5 disks required, 40\% capacity.
       \texttt{zpool create myz3 raidz3 disk1 disk2 disk3 disk4 disk5}
   \end{Description}
